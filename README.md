@@ -28,6 +28,7 @@ php artisan serve
 Frontend
 cd loan-frontend
 npm install
+npm install tailwindcss@3 @tailwindcss/cli -D
 npm run dev
 
 🔐 Auth
