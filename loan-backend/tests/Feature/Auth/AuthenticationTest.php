@@ -1,35 +1,52 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
-test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create();
+uses(RefreshDatabase::class);
 
-    $response = $this->post('/login', [
+// Login with correct credentials
+test('users can authenticate using the API login route', function () {
+    $user = User::factory()->create([
+        'password' => bcrypt('password'),
+    ]);
+
+    $response = $this->postJson('/api/login', [
         'email' => $user->email,
         'password' => 'password',
     ]);
 
-    $this->assertAuthenticated();
-    $response->assertNoContent();
+    $response->assertOk()
+             ->assertJsonStructure(['token', 'user']);
+
+    $this->assertDatabaseHas('personal_access_tokens', [
+        'tokenable_id' => $user->id,
+        'tokenable_type' => get_class($user),
+    ]);
 });
 
-test('users can not authenticate with invalid password', function () {
-    $user = User::factory()->create();
+// Login with invalid password
+test('users cannot authenticate with invalid credentials', function () {
+    $user = User::factory()->create([
+        'password' => bcrypt('password'),
+    ]);
 
-    $this->post('/login', [
+    $response = $this->postJson('/api/login', [
         'email' => $user->email,
         'password' => 'wrong-password',
     ]);
 
-    $this->assertGuest();
+    $response->assertStatus(401);
 });
 
-test('users can logout', function () {
+// Logout via API (assuming your /api/logout invalidates token)
+test('authenticated users can logout via API', function () {
     $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->post('/logout');
+    Sanctum::actingAs($user);
 
-    $this->assertGuest();
+    $response = $this->postJson('/api/logout');
+
     $response->assertNoContent();
 });

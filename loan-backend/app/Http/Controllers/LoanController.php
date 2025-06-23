@@ -29,18 +29,20 @@ class LoanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'amount' => 'required|numeric|min:5',
+            'amount' => 'required|numeric|min:100',
             'term' => 'required|integer|min:1',
         ]);
 
         $loan = $request->user()->loans()->create([
             'amount' => $validated['amount'],
             'term' => $validated['term'],
-            'interest_rate' => 10.0, // default
+            'interest_rate' => 10.0, // Default or calculated
+            'status' => 'pending',
         ]);
 
         return response()->json($loan, 201);
     }
+
 
     /**
      * Display the specified resource.

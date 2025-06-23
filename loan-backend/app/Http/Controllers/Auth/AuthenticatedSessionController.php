@@ -38,10 +38,11 @@ class AuthenticatedSessionController extends Controller
     /**
      * Log the user out by revoking the token.
      */
-    public function destroy(Request $request)
+   public function destroy(Request $request): \Illuminate\Http\Response
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'Logged out']);
+        return response()->noContent();
     }
+
 }
