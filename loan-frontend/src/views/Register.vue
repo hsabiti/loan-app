@@ -50,27 +50,35 @@ export default {
   },
   methods: {
     async register() {
-      this.errorMessage = ''
+    this.errorMessage = ''
 
-      try {
-        const response = await axios.post('/register', {
-          name: this.name,
-          email: this.email,
-          password: this.password,
-          password_confirmation: this.password_confirmation
-        })
+    try {
+      // Step 1: Register user
+      await axios.post('/register', {
+        name: this.name,
+        email: this.email,
+        password: this.password,
+        password_confirmation: this.password_confirmation
+      })
 
-        localStorage.setItem('token', response.data.token)
-        this.$router.push('/dashboard')
-      } catch (err) {
-        if (err.response && err.response.data?.message) {
-          this.errorMessage = err.response.data.message
-        } else {
-          this.errorMessage = 'Registration failed. Please check your inputs.'
-        }
-        console.error('Registration failed:', err)
+      // Step 2: Login user immediately
+      const loginResponse = await axios.post('/login', {
+        email: this.email,
+        password: this.password
+      })
+
+      localStorage.setItem('token', loginResponse.data.token)
+      this.$router.push('/dashboard')
+    } catch (err) {
+      if (err.response && err.response.data?.message) {
+        this.errorMessage = err.response.data.message
+      } else {
+        this.errorMessage = 'Registration failed. Please check your inputs.'
       }
+      console.error('Registration/Login failed:', err)
     }
+  }
+
   }
 }
 </script>
