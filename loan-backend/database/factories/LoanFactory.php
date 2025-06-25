@@ -5,6 +5,8 @@ namespace Database\Factories;
 use App\Models\Loan;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class LoanFactory extends Factory
 {
@@ -12,17 +14,17 @@ class LoanFactory extends Factory
 
     public function definition(): array
     {
-        $amount = $this->faker->numberBetween(1000, 10000);
-        $term = $this->faker->numberBetween(6, 24);
-        $rate = 10.0;
+        $start = Carbon::parse('2025-06-01');
+        $end = Carbon::parse('2025-11-30');
 
         return [
-            'user_id' => User::factory(), // creates a user and attaches loan
-            'amount' => $amount,
-            'term' => $term,
-            'interest_rate' => $rate,
-            'status' => $this->faker->randomElement(['pending', 'approved', 'rejected']),
+            'user_id' => User::factory(),
+            'name' => 'Demo Loan',
+            'amount' => 100000.00,
+            'annual_interest_rate' => 0.09,
+            'repayment_type' => 'repayment',
+            'start_date' => $start,
+            'end_date' => $end,
         ];
     }
 }
-

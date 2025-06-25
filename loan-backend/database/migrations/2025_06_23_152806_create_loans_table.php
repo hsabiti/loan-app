@@ -11,15 +11,18 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('loans', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->decimal('amount', 12, 2);
-            $table->unsignedInteger('term'); // in months
-            $table->decimal('interest_rate', 5, 2)->default(10.0); // 10% default
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-            $table->timestamps();
-        });
+       Schema::create('loans', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('user_id')->constrained()->onDelete('cascade');
+        $table->string('name')->nullable();
+        $table->decimal('amount', 15, 2);
+        $table->decimal('annual_interest_rate', 5, 4);
+        $table->enum('repayment_type', ['repayment', 'interest-only', 'interest-retained']);
+        $table->date('start_date');
+        $table->date('end_date');
+
+        $table->timestamps();
+    });
 }
 
 

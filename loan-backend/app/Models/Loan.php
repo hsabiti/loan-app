@@ -4,12 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Loan extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['amount', 'term', 'interest_rate', 'status'];
+    protected $fillable = [
+        'user_id',
+        'name',
+        'amount',
+        'annual_interest_rate',
+        'repayment_type',
+        'start_date',
+        'end_date',
+    ];
+
 
     public function user()
     {
@@ -21,8 +31,18 @@ class Loan extends Model
         return round($this->amount + ($this->amount * ($this->interest_rate / 100)), 2);
     }
 
-    public function getMontlyPayableAttribute()
+    public function getMonthlyPaymentAttribute()
     {
-        return round($this->total_repayable / $this->term, 2);
+        $months = Carbon::parse($this->start_date)->diffInMonths($this->end_date);
+        return $months > 0
+            ? round($this->getTotalRepayableAttribute() / $months, 2)
+            : 0;
     }
+
+
+    public function events()
+    {
+        return $this->hasMany(LoanEvent::class);
+    }
+
 }

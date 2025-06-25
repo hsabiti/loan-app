@@ -5,15 +5,16 @@ namespace App\Policies;
 use App\Models\Loan;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Support\Facades\Log;
 
 class LoanPolicy
 {
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user, Loan $loan): bool
+    public function viewAny(User $user): bool
     {
-        return $user->id === $loan->user_id;
+        return true;
     }
 
     /**
@@ -21,8 +22,14 @@ class LoanPolicy
      */
     public function view(User $user, Loan $loan): bool
     {
-        return false;
+        Log::info('POLICY CHECK', [
+            'auth_user_id' => $user->id,
+            'loan_user_id' => $loan->user_id,
+        ]);
+        return $user->id === $loan->user_id;
     }
+
+
 
     /**
      * Determine whether the user can create models.

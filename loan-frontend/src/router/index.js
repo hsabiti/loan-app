@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import Dashboard from '../views/Dashboard.vue'
+import LoanDetails from '../views/LoanDetails.vue' // 👈 Import new view
 
 const routes = [
   { path: '/', redirect: '/login' },
@@ -10,7 +11,12 @@ const routes = [
   {
     path: '/dashboard',
     component: Dashboard,
-    meta: { requiresAuth: true }  // 👈 protected route
+    meta: { requiresAuth: true }  // 👈 Protected route
+  },
+  {
+    path: '/loan/:id',
+    component: LoanDetails,
+    meta: { requiresAuth: true }  // 👈 Also protected
   },
   { path: '/:pathMatch(.*)*', redirect: '/login' },
 ]
@@ -20,7 +26,7 @@ const router = createRouter({
   routes,
 })
 
-// ✅ Auth guard
+// ✅ Auth guard logic
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
 
