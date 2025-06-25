@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Loan;
+use App\Models\LoanEvent;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -59,7 +60,7 @@ class LoanController extends Controller
         return response()->json([
             'message' => 'Loan saved successfully.',
             'loan' => $loan->load('events')
-        ]);
+        ], 201);
     }
 
 
@@ -96,4 +97,37 @@ class LoanController extends Controller
     {
         //
     }
+
+    public function destroyEvent(Loan $loan, LoanEvent $event)
+    {
+        $this->authorize('view', $loan); // Ensures the current user owns the loan
+
+        if ($event->loan_id !== $loan->id) {
+            return response()->json(['message' => 'This event does not belong to the specified loan.'], 403);
+        }
+
+        $event->delete();
+
+        return response()->json(['message' => 'Loan event deleted successfully.']);
+    }
+
+    public function storeEvent(Request $request, Loan $loan)
+    {
+        $this->authorize('view', $loan); // Ensure user owns this loan
+
+        $validated = $request->validate([
+            'type' => 'required|in:part_payment,rate_change,early_payoff',
+            'event_date' => 'required|date',
+            'amount' => 'nullable|numeric|min:0',
+            'rate' => 'nullable|numeric|min:0',
+        ]);
+
+        $event = $loan->events()->create($validated);
+
+        return response()->json([
+            'message' => 'Event added',
+            'event' => $event
+        ], 201);
+    }
+
 }

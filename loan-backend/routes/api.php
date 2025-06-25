@@ -17,6 +17,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/loan/calculate', [LoanCalculationController::class, 'calculate']);
     Route::post('/loan/recalculate', [LoanCalculationController::class, 'recalculate']);
+    Route::post('/loans/{loan}/events', [LoanController::class, 'storeEvent']);
+    Route::delete('/loans/{loan}/events/{event}', [LoanController::class, 'destroyEvent']);
 
 });
 

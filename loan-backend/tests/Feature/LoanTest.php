@@ -15,15 +15,24 @@ class LoanTest extends TestCase
     {
         $user = User::factory()->create();
 
-        // Authenticate the user using Sanctum
         Sanctum::actingAs($user);
 
-        $response = $this->postJson('/api/loans', [
+        $payload = [
+            'name' => 'Test Loan',
             'amount' => 5000,
-            'term' => 12,
-        ]);
+            'annual_interest_rate' => 0.09,
+            'repayment_type' => 'repayment',
+            'start_date' => '2025-06-01',
+            'end_date' => '2025-12-01',
+        ];
 
-        $response->assertCreated()
-                 ->assertJsonStructure(['id', 'amount', 'term', 'interest_rate', 'status']);
+        $response = $this->postJson('/api/loans', $payload);
+
+        $response->assertStatus(201)
+                ->assertJsonFragment([
+                    'amount' => 5000,
+                    'repayment_type' => 'repayment',
+                ]);
     }
+
 }
